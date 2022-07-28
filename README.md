@@ -1,2 +1,2 @@
-curl -X POST -d @alert.json -H "Content-type: application/json" http://localhost:8080/
-curl -X POST -d @job.json -H "Content-type: application/json" -H "Authentication: Bearer adSeNlIWUzEQFO2iNPCvE8jHXCKWsl" https://example-ansible-automation-platform.apps.cluster-jjjzg.jjjzg.sandbox458.opentlc.com/api/v2/job_templates/9/launch/
+# ACS Ansible Notifier
+This app is intended to serve as an intermediary between a Stackrox Generic Webhook notifier in Advanced Cluster Security and an instance of Ansible Automation Controller. It's useful in the event that you wish to run an Ansible job in response to an alert from ACS, such as a policy violation.
