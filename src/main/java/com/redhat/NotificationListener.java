@@ -13,18 +13,16 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 public class NotificationListener {
     public static final String ANSIBLE_USERNAME = System.getenv("ANSIBLE_USERNAME");
     public static final String ANSIBLE_PASSWORD = System.getenv("ANSIBLE_PASSWORD");
-    public static final String ANSIBLE_TEMPLATE_ID = System.getenv("ANSIBLE_TEMPLATE_ID");
 
     @RestClient
     JobTemplateService jobTemplateService;
 
     @POST
-    public JsonObject notification(JsonObject alert) {
-        JsonObject data = Json.createObjectBuilder().add("extra_vars", alert).build();
-        jobTemplateService.launchJob("Basic  " +
-                Base64.getEncoder().encodeToString((ANSIBLE_USERNAME + ":" + ANSIBLE_PASSWORD).getBytes()),
-                ANSIBLE_TEMPLATE_ID,
-                data.toString());
-        return alert.getJsonObject("alert");
+    public JsonObject notification(JsonObject notification) {
+        String templateId = notification.getString("template_id");
+        String authString = "Basic  " + Base64.getEncoder().encodeToString((ANSIBLE_USERNAME + ":" + ANSIBLE_PASSWORD).getBytes());
+        String payload = Json.createObjectBuilder().add("extra_vars", notification).build().toString();
+        jobTemplateService.launchJob(authString, templateId, payload);
+        return Json.createObjectBuilder().build();
     }
 }
