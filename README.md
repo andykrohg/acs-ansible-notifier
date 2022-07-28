@@ -1,1 +1,2 @@
 curl -X POST -d @alert.json -H "Content-type: application/json" http://localhost:8080/
+curl -X POST -d @job.json -H "Content-type: application/json" -H "Authentication: Bearer adSeNlIWUzEQFO2iNPCvE8jHXCKWsl" https://example-ansible-automation-platform.apps.cluster-jjjzg.jjjzg.sandbox458.opentlc.com/api/v2/job_templates/9/launch/
