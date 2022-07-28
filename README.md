@@ -1,0 +1,1 @@
+curl -X POST -d @alert.json -H "Content-type: application/json" http://localhost:8080/

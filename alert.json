@@ -1,0 +1,169 @@
+{
+    "alert": {
+        "id": "d40f2bbb-b04c-49e3-a7f7-fafb824f1bf4",
+        "policy": {
+            "id": "fe9de18b-86db-44d5-a7c4-74173ccffe2e",
+            "name": "Privileged Container",
+            "description": "Alert on deployments with containers running in privileged mode",
+            "rationale": "Containers running as privileged represent greater post-exploitation risk by allowing an attacker to access all host devices, run a daemon in the container, etc.",
+            "remediation": "Verify that privileged capabilities are required and cannot be provided with a subset of other controls.",
+            "categories": [
+                "Privileges",
+                "Docker CIS"
+            ],
+            "lifecycleStages": [
+                "DEPLOY"
+            ],
+            "exclusions": [
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "stackrox"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "kube-system"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "istio-system"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-node"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-sdn"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-kube-apiserver"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-etcd"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-apiserver"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-dns"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-cluster-node-tuning-operator"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-cluster-csi-drivers"
+                        }
+                    }
+                },
+                {
+                    "deployment": {
+                        "scope": {
+                            "namespace": "openshift-machine-config-operator"
+                        }
+                    }
+                }
+            ],
+            "severity": "MEDIUM_SEVERITY",
+            "notifiers": [
+                "6e43e322-9e5f-4579-8433-da7d9efa38d9"
+            ],
+            "lastUpdated": "2022-07-26T20:15:43.034144575Z",
+            "SORTName": "Privileged Container",
+            "SORTLifecycleStage": "DEPLOY",
+            "policyVersion": "1.1",
+            "policySections": [
+                {
+                    "policyGroups": [
+                        {
+                            "fieldName": "Privileged Container",
+                            "values": [
+                                {
+                                    "value": "true"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "criteriaLocked": true,
+            "mitreVectorsLocked": true,
+            "isDefault": true
+        },
+        "clusterId": "bdca9ff2-19d1-49c4-9a57-51f350bbea16",
+        "clusterName": "my-cluster",
+        "namespace": "test",
+        "namespaceId": "e9ca7ae7-23a5-47c3-b78e-8eb59586cfcd",
+        "deployment": {
+            "id": "a7a66509-f8e6-43bf-be29-43bfe910a354",
+            "name": "bash",
+            "type": "Pod",
+            "namespace": "test",
+            "namespaceId": "e9ca7ae7-23a5-47c3-b78e-8eb59586cfcd",
+            "labels": {
+                "run": "bash"
+            },
+            "clusterId": "bdca9ff2-19d1-49c4-9a57-51f350bbea16",
+            "clusterName": "my-cluster",
+            "containers": [
+                {
+                    "image": {
+                        "name": {
+                            "registry": "docker.io",
+                            "remote": "library/bash",
+                            "tag": "latest",
+                            "fullName": "docker.io/library/bash:latest"
+                        }
+                    },
+                    "name": "bash"
+                }
+            ],
+            "annotations": {
+                "openshift.io/scc": "node-exporter"
+            }
+        },
+        "violations": [
+            {
+                "message": "Container 'bash' is privileged"
+            }
+        ],
+        "time": "2022-07-26T20:16:12.685062814Z",
+        "firstOccurred": "2022-07-26T20:16:12.688104504Z"
+    }
+}
