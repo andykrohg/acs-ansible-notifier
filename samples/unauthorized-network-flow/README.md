@@ -1,4 +1,4 @@
 # Unauthorized Network Flow Sample
 In this sample, we respond to violations of the **Unauthorized Network Flow** System Policy, which fires whenever there is a **network baseline violation** for a deployment with corresponding [alerting enabled](https://docs.openshift.com/acs/3.71/operating/manage-network-policies.html#enable-alert-on-baseline-violations_manage-network-policies). A nice way to demonstrate this is to use [this demo](https://cloud.redhat.com/blog/network-policies-controlling-cross-project-communication-on-openshift), marking the traffic from the **rogue** deployment as **anomalous**.
 
-Leverage the `main.yml` file in this directory in your Ansible Job Template to scale `replicas` to zero for the `source` of network flows that violate the baseline. Using the sample above, the Deployment name **rogue** in the namespace named **rogue** would be scaled to zero.
+Leverage the `main.yml` file in this directory in your Ansible Job Template to scale `replicas` to zero for the `source` of network flows that violate the baseline. Using the sample above, the Deployment named **rogue** in the namespace named **rogue** would be scaled to zero.
