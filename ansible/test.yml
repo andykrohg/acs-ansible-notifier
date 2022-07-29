@@ -1,6 +1,8 @@
 - hosts: localhost
   gather_facts: no
   tasks:
+  - pause:
+      miunutes: 10
   - k8s_info:
       kind: Namespace
       name: test
