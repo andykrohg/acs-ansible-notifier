@@ -4,7 +4,9 @@ This app is intended to serve as an intermediary between a Stackrox Generic Webh
 ## Deployment Guide
 ### Configure Ansible Automation Controller
 #### Create a Job Template
-Ensure that you have a Job Template ready to roll on Automation Controller - we'll be invoking this upon policy violations using the REST API. You'll have access to contextual information in an extra variable called `alert`, so make sure your Template indicates **Prompt on launch** for extra variables. There's an example playbook in the `ansible` directory of this repository. Make note of this template's *numerical template id*, viewable in the address bar.
+Ensure that you have a Job Template ready to roll on Automation Controller - we'll be invoking this upon policy violations using the REST API. You'll have access to contextual information in an extra variable called `alert`, so make sure your Template indicates **Prompt on launch** for extra variables. Make note of this template's *numerical template id*, viewable in the address bar.
+
+Take a look at the [samples directory](samples) for some example use cases and corresponding playbooks.
 
 #### Configure your instance group
 If you want your ansible job to perform actions in OpenShift with the `k8s` module to respond to the policy violation, _and_ you have AAP deployed on OpenShift, you'll probably want to configure your runner `Pod` template with a service account that has the necessary privileges. In order to to this:
@@ -26,7 +28,6 @@ If you want your ansible job to perform actions in OpenShift with the `k8s` modu
   oc -n ansible-automation-platform create serviceaccount my-ansible-sa
   oc -n ansible-automation-platform adm policy add-cluster-role-to-user cluster-admin -z my-ansible-sa
   ```
-
 
 ### Deploy the Notifier
 Next, we'll deploy an instance of this project to OpenShift.
