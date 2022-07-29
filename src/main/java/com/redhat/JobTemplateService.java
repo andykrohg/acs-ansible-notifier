@@ -1,6 +1,5 @@
 package com.redhat;
 
-import javax.json.JsonObject;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
