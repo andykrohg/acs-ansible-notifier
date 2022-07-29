@@ -1,10 +1,6 @@
 - hosts: localhost
   gather_facts: no
   tasks:
-  - pause:
-      minutes: 10
   - k8s_info:
       kind: Namespace
       name: test
-      api_key: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
-      host: "{{ lookup('env', 'KUBERNETES_SERVICE_HOST') + ':' + lookup('env', 'KUBERNETES_SERVICE_PORT') }}"
