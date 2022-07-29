@@ -1,10 +1,11 @@
 # ACS Ansible Notifier
 This app is intended to serve as an intermediary between a Stackrox Generic Webhook notifier in Advanced Cluster Security and an instance of Ansible Automation Controller. It's useful in the event that you wish to run an Ansible job in response to an alert from ACS, such as a policy violation.
 
-## Create a Job Template on Ansible Automation Controller
-Ensure that you have a Job Template ready to roll on Automation Controller - we'll be invoking this upon policy violations using the REST API. You'll have access to contextual information in an extra variable called `alert`, so make sure your Template indicates **Prompt on launch** for extra variables. There's an example playbook in the `ansible` directory of this repository. Make note of this templates *numerical template id*, viewable in the address bar.
+## Deployment Guide
+### Create a Job Template on Ansible Automation Controller
+Ensure that you have a Job Template ready to roll on Automation Controller - we'll be invoking this upon policy violations using the REST API. You'll have access to contextual information in an extra variable called `alert`, so make sure your Template indicates **Prompt on launch** for extra variables. There's an example playbook in the `ansible` directory of this repository. Make note of this template's *numerical template id*, viewable in the address bar.
 
-## Deploy the Notifier
+### Deploy the Notifier
 Next, we'll deploy an instance of this project to OpenShift.
 ```bash
 # Set environment variable for server URL. Be sure to include /api
@@ -16,7 +17,7 @@ oc new-app quay.io/akrohg/acs-ansible-notifier \
 oc expose svc/acs-ansible-notifier
 ```
 
-## Create an Integration spec on ACS
+### Create an Integration spec on ACS
 * In ACS, go to **Platform Configuration -> Integrations**
 * Select **Notifier Integrations -> Generic Webhook**, and click **New Integration**
 * Give your integration a name, and provide the route to your `acs-ansible-notifier` app in the **Endpoint**
@@ -27,3 +28,14 @@ oc expose svc/acs-ansible-notifier
     * Key: `template_id`
     * Value: `<your numerical ansible job template id>`
 * Then edit the Policy you want to notify on, and add this integration to the list of notifiers
+
+## Local Development
+### Running the quarkus app in dev mode
+```bash
+./mvnw quarkus:dev
+```
+
+### Building a container image
+```bash
+podman build . -f src/main/docker/Dockerfile.jvm -t local/acs-ansible-notifier --no-cache --platform linux/amd64
+```
