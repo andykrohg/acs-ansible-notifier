@@ -8,9 +8,9 @@
 
   - name: Obtain Source Deployment Info
     set_fact:
-      source_deployment_kind: "{{ alert.policy.violations[0].source.deploymentType }}"
-      source_deployment_namespace: "{{ alert.policy.violations[0].source.deploymentNamespace }}"
-      source_deployment_name: "{{ alert.policy.violations[0].source.name }}"
+      source_deployment_kind: "{{ alert.violations[0].source.deploymentType }}"
+      source_deployment_namespace: "{{ alert.violations[0].source.deploymentNamespace }}"
+      source_deployment_name: "{{ alert.violations[0].source.name }}"
 
   - name: Unschedule rogue workload
     k8s:
