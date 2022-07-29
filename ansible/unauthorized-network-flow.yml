@@ -1,0 +1,24 @@
+- hosts: localhost
+  gather_facts: no
+  name: Respond to Unauthorized Network Flow events in ACS
+  tasks:
+  - name: Send Alert content to stdout
+    debug:
+      msg: "{{ alert }}"
+
+  - name: Obtain Source Deployment Info
+    set_fact:
+      source_deployment_kind: "{{ alert.policy.violations[0].source.deploymentType }}"
+      source_deployment_namespace: "{{ alert.policy.violations[0].source.deploymentNamespace }}"
+      source_deployment_name: "{{ alert.policy.violations[0].source.name }}"
+
+  - name: Unschedule rogue workload
+    k8s:
+      definition: |
+        apiVersion: apps/v1
+        kind: {{ source_deployment_kind }}
+        metadata:
+          name: {{ source_deployment_name }}
+          namespace: {{ source_deployment_namespace }}
+        spec:
+          replicas: 0
