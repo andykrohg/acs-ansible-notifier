@@ -4,7 +4,8 @@ This app is intended to serve as an intermediary between a Stackrox Generic Webh
 ## Create a Job Template on Ansible Automation Controller
 Ensure that you have a Job Template ready to roll on Automation Controller - we'll be invoking this upon policy violations using the REST API. You'll have access to contextual information in an extra variable called `alert`, so make sure your Template indicates **Prompt on launch** for extra variables. There's an example playbook in the `ansible` directory of this repository. Make note of this templates *numerical template id*, viewable in the address bar.
 
-## Run this project on OpenShift
+## Deploy the Notifier
+Next, we'll deploy an instance of this project to OpenShift.
 ```bash
 # Set environment variable for server URL. Be sure to include /api
 ANSIBLE_API_SERVER_URL=https://automation-controller.com/api
@@ -16,8 +17,10 @@ oc expose svc/acs-ansible-notifier
 ```
 
 ## Create an Integration spec on ACS
-* Select **Generic Webhook**
-* Provide the route to your `acs-ansible-notifier` app in the **Endpoint**
+* In ACS, go to **Platform Configuration -> Integrations**
+* Select **Notifier Integrations -> Generic Webhook**, and click **New Integration**
+* Give your integration a name, and provide the route to your `acs-ansible-notifier` app in the **Endpoint**
+* (Optional) Deselect **Skip TLS verification** if your Automation Controller isn't using a well-known certificate
 * (Optional) Deselect **Enable audit logging** if all you want to do is respond to alerts
 * Provide a **Username** and **Password** to authenticate to Automation Controller
 * Under **Extra Fields**, add one that looks like this:
