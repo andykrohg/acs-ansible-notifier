@@ -1,0 +1,6 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - k8s_info:
+      kind: Namespace
+      name: test
