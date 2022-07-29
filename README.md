@@ -21,7 +21,7 @@ oc expose svc/acs-ansible-notifier
 * In ACS, go to **Platform Configuration -> Integrations**
 * Select **Notifier Integrations -> Generic Webhook**, and click **New Integration**
 * Give your integration a name, and provide the route to your `acs-ansible-notifier` app in the **Endpoint**
-* (Optional) Deselect **Skip TLS verification** if your Automation Controller isn't using a well-known certificate
+* (Optional) Select **Skip TLS verification** if your Automation Controller isn't using a well-known certificate
 * (Optional) Deselect **Enable audit logging** if all you want to do is respond to alerts
 * Provide a **Username** and **Password** to authenticate to Automation Controller
 * Under **Extra Fields**, add one that looks like this:
