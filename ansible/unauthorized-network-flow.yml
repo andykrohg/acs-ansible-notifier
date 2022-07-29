@@ -6,11 +6,16 @@
     debug:
       msg: "{{ alert }}"
 
-  - name: Obtain Source Deployment Info
-    set_fact:
-      source_deployment_kind: "{{ alert.violations[0].networkFlowInfo.source.deploymentType }}"
-      source_deployment_namespace: "{{ alert.violations[0].networkFlowInfo.source.deploymentNamespace }}"
-      source_deployment_name: "{{ alert.violations[0].networkFlowInfo.source.name }}"
+  - block:
+    - name: Obtain Source Deployment Info
+      set_fact:
+        source_deployment_kind: "{{ alert.violations[0].networkFlowInfo.source.deploymentType }}"
+        source_deployment_namespace: "{{ alert.violations[0].networkFlowInfo.source.deploymentNamespace }}"
+        source_deployment_name: "{{ alert.violations[0].networkFlowInfo.source.name }}"
+    rescue:
+    - debug: 
+        msg: "Unexpected payload format. Failure details: {{ ansible_failed_result }}"
+    - meta: end_play
 
   - name: Unschedule rogue workload
     k8s:
