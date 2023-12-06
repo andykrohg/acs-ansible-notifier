@@ -1,0 +1,101 @@
+{
+  "id": "780867da-2a66-4f14-8a89-629a1dce869f",
+  "policy": {
+    "id": "2db9a279-2aec-4618-a85d-7f1bdf4911b1",
+    "name": "90-Day Image Age",
+    "description": "Alert on deployments with images that haven't been updated in 90 days",
+    "rationale": "Base images are updated frequently with bug fixes and vulnerability patches. Image age exceeding 90 days may indicate a higher risk of vulnerabilities existing in the image.",
+    "remediation": "Rebuild your image, push a new minor version (with a new immutable tag), and update your service to use it.",
+    "categories": [
+      "DevOps Best Practices",
+      "Security Best Practices"
+    ],
+    "lifecycleStages": [
+      "BUILD",
+      "DEPLOY"
+    ],
+    "exclusions": [
+      {
+        "deployment": {
+          "scope": {
+            "namespace": "kube-system"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "scope": {
+            "namespace": "istio-system"
+          }
+        }
+      }
+    ],
+    "severity": "LOW_SEVERITY",
+    "notifiers": [
+      "30e3ea3a-1f44-4dc1-91aa-aa79b8f127b6"
+    ],
+    "lastUpdated": "2023-12-06T19:53:44.055945689Z",
+    "SORTName": "90-Day Image Age",
+    "SORTLifecycleStage": "BUILD,DEPLOY",
+    "policyVersion": "1.1",
+    "policySections": [
+      {
+        "policyGroups": [
+          {
+            "fieldName": "Image Age",
+            "values": [
+              {
+                "value": "90"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "criteriaLocked": true,
+    "mitreVectorsLocked": true,
+    "isDefault": true
+  },
+  "clusterId": "84b62da2-e683-4f5c-be17-ce4f95fe58bf",
+  "clusterName": "my-cluster",
+  "namespace": "ansible-automation-platform",
+  "namespaceId": "2093b23d-4c73-4422-bb1a-7ef9a4f3dede",
+  "deployment": {
+    "id": "63d4c6a0-fc18-42a9-87d8-5604c917e35f",
+    "name": "acs-ansible-notifier",
+    "type": "Deployment",
+    "namespace": "ansible-automation-platform",
+    "namespaceId": "2093b23d-4c73-4422-bb1a-7ef9a4f3dede",
+    "labels": {
+      "app": "acs-ansible-notifier",
+      "app.kubernetes.io/component": "acs-ansible-notifier",
+      "app.kubernetes.io/instance": "acs-ansible-notifier"
+    },
+    "clusterId": "84b62da2-e683-4f5c-be17-ce4f95fe58bf",
+    "clusterName": "my-cluster",
+    "containers": [
+      {
+        "image": {
+          "id": "sha256:7772742eb32470b60f49846d69aa44f4686d335d76fdf8eebb74e00d0444c0a7",
+          "name": {
+            "registry": "quay.io",
+            "remote": "akrohg/acs-ansible-notifier",
+            "fullName": "quay.io/akrohg/acs-ansible-notifier@sha256:7772742eb32470b60f49846d69aa44f4686d335d76fdf8eebb74e00d0444c0a7"
+          }
+        },
+        "name": "acs-ansible-notifier"
+      }
+    ],
+    "annotations": {
+      "image.openshift.io/triggers": "[{\"from\":{\"kind\":\"ImageStreamTag\",\"name\":\"acs-ansible-notifier:latest\"},\"fieldPath\":\"spec.template.spec.containers[?(@.name==\\\"acs-ansible-notifier\\\")].image\"}]",
+      "openshift.io/generated-by": "OpenShiftNewApp"
+    }
+  },
+  "violations": [
+    {
+      "message": "Container 'acs-ansible-notifier' has image created at 2022-10-09 21:43:33 (UTC)"
+    }
+  ],
+  "time": "2023-12-06T19:53:44.237094557Z",
+  "firstOccurred": "2023-12-06T19:53:44.237094557Z"
+}

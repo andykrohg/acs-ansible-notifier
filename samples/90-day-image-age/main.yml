@@ -1,0 +1,32 @@
+- hosts: localhost
+  gather_facts: no
+  name: Delete an image that hasn't been updated in 90 days
+  vars: 
+    alert: "{{ lookup('file', 'alert.json') }}"
+  tasks:
+  - name: Send Alert content to stdout
+    debug:
+      msg: "{{ alert }}"
+
+  - block:
+    - name: Obtain Deployment and Image Info
+      set_fact:
+        deployment_namespace: "{{ alert.deployment.namespace }}"
+        deployment_name: "{{ alert.deployment.name }}"
+        image_registry: "{{ alert.deployment.containers[0].image.name.registry }}"
+        image_name: "{{ alert.deployment.containers[0].image.name.fullName }}"
+    rescue:
+    - debug: 
+        msg: "Unexpected payload format. Failure details: {{ ansible_failed_result }}"
+    - meta: end_play
+
+  # - name: Unschedule rogue workload
+  #   k8s:
+  #     definition: |
+  #       apiVersion: apps/v1
+  #       kind: {{ source_deployment_kind }}
+  #       metadata:
+  #         name: {{ source_deployment_name }}
+  #         namespace: {{ source_deployment_namespace }}
+  #       spec:
+  #         replicas: 0
