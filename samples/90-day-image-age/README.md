@@ -1,4 +1,5 @@
-# Unauthorized Network Flow Sample
-In this sample, we respond to violations of the **Unauthorized Network Flow** System Policy, which fires whenever there is a **network baseline violation** for a deployment with corresponding [alerting enabled](https://docs.openshift.com/acs/3.71/operating/manage-network-policies.html#enable-alert-on-baseline-violations_manage-network-policies). A nice way to demonstrate this is to use [this demo](https://cloud.redhat.com/blog/network-policies-controlling-cross-project-communication-on-openshift), marking the traffic from the **rogue** deployment as **anomalous**.
+# 90-Day Image Age Sample
+In this example, we kick ACS into overdrive by empowering it to exact swift revenge on any workloads that are running images older than 90 days. Blowing past registering an informational error, this sample will scale down the offending workload and destroy the image in the source registry, making it impossible for the workload to continue running until a new build is performed.
 
-Follow [the deployment guide](../../README.md) for wiring up your components, and leverage the `main.yml` file in this directory in your Ansible Job Template to scale `replicas` to zero for the `source` of network flows that violate the baseline. Using the sample above, the Deployment named **rogue** in the namespace named **rogue** would be scaled to zero.
+1. Run `setup.sh` to deploy a Docker registry and sample app
+2. Use the `main.yml` playbook to initiate vengence (`skopeo` must be installed)
