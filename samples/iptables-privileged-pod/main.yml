@@ -1,8 +1,24 @@
 - hosts: localhost
   gather_facts: no
   name: Respond to Iptables being executed in a privileged container
+  vars: 
+    alert: "{{ lookup('file', 'alert.json') }}"
   tasks:
   - name: Send Alert content to stdout
     debug:
       msg: "{{ alert }}"
+  
+  - name: Obtain Pod UID
+    set_fact:
+      pod_uid: "{{ alert.processViolation.processes[0].podUid }}"
 
+  - name: Get audit log
+    shell: >
+      oc adm node-logs --role=master --path=kube-apiserver/audit.log | grep {{ pod_uid }}
+    register: audit_log_output
+
+  - name: Get User name
+    set_fact:
+      username: "{{ audit_log_output.stdout | regex_search('\"username\":\"([a-z0-9]+)\"', '\\1') | first }}"
+
+  # TODO: obliterate this user

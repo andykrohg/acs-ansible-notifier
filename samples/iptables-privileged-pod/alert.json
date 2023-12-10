@@ -1,0 +1,200 @@
+{
+  "clusterId": "84b62da2-e683-4f5c-be17-ce4f95fe58bf",
+  "clusterName": "my-cluster",
+  "deployment": {
+    "annotations": {
+      "openshift.io/scc": "node-exporter"
+    },
+    "clusterId": "84b62da2-e683-4f5c-be17-ce4f95fe58bf",
+    "clusterName": "my-cluster",
+    "containers": [
+      {
+        "image": {
+          "id": "sha256:4b253780b74fa76c09c4a57fe1f97ce66a91433258aa3d7612cd8899c5f171fb",
+          "name": {
+            "fullName": "docker.io/soarinferret/iptablesproxy:latest",
+            "registry": "docker.io",
+            "remote": "soarinferret/iptablesproxy",
+            "tag": "latest"
+          }
+        },
+        "name": "hack"
+      }
+    ],
+    "id": "cc0abac8-f131-4e6b-a9f0-47ce8287603c",
+    "labels": {
+      "run": "hack"
+    },
+    "name": "hack",
+    "namespace": "andy",
+    "namespaceId": "7a6bd14d-6979-442d-a893-9da30ce14c36",
+    "type": "Pod"
+  },
+  "firstOccurred": "2023-12-10T17:21:59.673381543Z",
+  "id": "19ab1f01-ae81-4946-bbf2-6e1675a8d550",
+  "lifecycleStage": "RUNTIME",
+  "namespace": "andy",
+  "namespaceId": "7a6bd14d-6979-442d-a893-9da30ce14c36",
+  "policy": {
+    "SORTLifecycleStage": "RUNTIME",
+    "SORTName": "Iptables or nftables Executed in Privileged Container",
+    "categories": [
+      "Network Tools",
+      "Security Best Practices"
+    ],
+    "criteriaLocked": true,
+    "description": "Alert on privileged pods that execute iptables or nftables",
+    "eventSource": "DEPLOYMENT_EVENT",
+    "exclusions": [
+      {
+        "deployment": {
+          "name": "haproxy-.*",
+          "scope": {
+            "namespace": "openshift-vsphere-infra"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "name": "keepalived-.*",
+          "scope": {
+            "namespace": "openshift-vsphere-infra"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "name": "coredns-.*",
+          "scope": {
+            "namespace": "openshift-vsphere-infra"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "name": "ovnkube-node",
+          "scope": {
+            "namespace": "openshift-ovn-kubernetes"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "scope": {
+            "namespace": "kube-system"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "scope": {
+            "namespace": "istio-system"
+          }
+        }
+      },
+      {
+        "deployment": {
+          "scope": {
+            "namespace": "openshift-sdn"
+          }
+        }
+      }
+    ],
+    "id": "ed8c7957-14de-40bc-aeab-d27ceeecfa7b",
+    "isDefault": true,
+    "lastUpdated": "2023-12-10T17:16:20.239216769Z",
+    "lifecycleStages": [
+      "RUNTIME"
+    ],
+    "mitreAttackVectors": [
+      {
+        "tactic": "TA0004",
+        "techniques": [
+          "T1611"
+        ]
+      },
+      {
+        "tactic": "TA0005",
+        "techniques": [
+          "T1562.004"
+        ]
+      }
+    ],
+    "mitreVectorsLocked": true,
+    "name": "Iptables or nftables Executed in Privileged Container",
+    "notifiers": [
+      "c7e2f42f-dc95-4b7a-ba04-744477cc6145"
+    ],
+    "policySections": [
+      {
+        "policyGroups": [
+          {
+            "fieldName": "Privileged Container",
+            "values": [
+              {
+                "value": "true"
+              }
+            ]
+          },
+          {
+            "fieldName": "Process Name",
+            "values": [
+              {
+                "value": "iptables"
+              },
+              {
+                "value": "nft"
+              }
+            ]
+          },
+          {
+            "fieldName": "Process UID",
+            "values": [
+              {
+                "value": "0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "policyVersion": "1.1",
+    "rationale": "Processes that are running with UID 0 run as the root user. iptables and nftables can be used in privileged containers to modify the node's network routing.",
+    "remediation": "Specify the USER instruction in the Docker image or the runAsUser field within the Pod Security Context",
+    "severity": "CRITICAL_SEVERITY"
+  },
+  "processViolation": {
+    "message": "Binary '/sbin/iptables' executed without arguments under user ID 0",
+    "processes": [
+      {
+        "containerName": "hack",
+        "containerStartTime": "2023-12-10T17:21:56Z",
+        "deploymentId": "cc0abac8-f131-4e6b-a9f0-47ce8287603c",
+        "id": "207cfd8f-c4ea-4bdf-8fbc-dff5aa326ecb",
+        "imageId": "sha256:4b253780b74fa76c09c4a57fe1f97ce66a91433258aa3d7612cd8899c5f171fb",
+        "namespace": "andy",
+        "podId": "hack",
+        "podUid": "3f3b0a88-4139-4194-99aa-ae13f5278b3b",
+        "signal": {
+          "containerId": "953be016390e",
+          "execFilePath": "/sbin/iptables",
+          "id": "a056f9c0-9780-11ee-ab4d-0a580a810215",
+          "lineageInfo": [
+            {
+              "parentExecFilePath": "/bin/sh"
+            }
+          ],
+          "name": "iptables",
+          "pid": 1757498,
+          "time": "2023-12-10T17:21:59.735519387Z"
+        }
+      }
+    ]
+  },
+  "time": "2023-12-10T17:21:59.673381543Z",
+  "violations": [
+    {
+      "message": "Container 'hack' is privileged"
+    }
+  ]
+}
