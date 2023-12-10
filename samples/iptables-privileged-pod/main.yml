@@ -1,0 +1,8 @@
+- hosts: localhost
+  gather_facts: no
+  name: Respond to Iptables being executed in a privileged container
+  tasks:
+  - name: Send Alert content to stdout
+    debug:
+      msg: "{{ alert }}"
+
