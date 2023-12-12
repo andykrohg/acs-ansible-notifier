@@ -37,6 +37,7 @@
         spec:
           replicas: 0
 
+# TODO: implement this for the internal registry too and use `oc delete image ...`
   - name: Delete the offending image
     shell: >
       skopeo delete docker://registry-andy.apps.aromerot.sandbox2426.opentlc.com/aromero/dc-metro-map:latest

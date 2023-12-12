@@ -1,8 +1,6 @@
 - hosts: localhost
   gather_facts: no
   name: Respond to Iptables being executed in a privileged container
-  vars: 
-    alert: "{{ lookup('file', 'alert.json') }}"
   tasks:
   - name: Send Alert content to stdout
     debug:
@@ -21,4 +19,27 @@
     set_fact:
       username: "{{ audit_log_output.stdout | regex_search('\"username\":\"([a-z0-9]+)\"', '\\1') | first }}"
 
-  # TODO: obliterate this user
+  - name: Get ClusterRoleBindings
+    shell: >
+      oc get clusterrolebindings -o json | jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
+    register: clusterrolebindings
+
+  - name: Get RoleBindings
+    shell: >
+      oc get rolebindings -A -o json | jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
+    register: rolebindings
+
+  - name: Print out bindings to be removed
+    debug:
+      msg: |
+        Removing the following bindings:
+        
+        {{ clusterrolebindings.stdout | from_json | to_nice_json }}
+
+        {{ rolebindings.stdout | from_json | to_nice_json }}
+
+  - name: Remove bindings
+    k8s:
+      state: absent
+      definition: |
+        {{ ( clusterrolebindings.stdout | from_json ) + ( rolebindings.stdout | from_json ) }}
