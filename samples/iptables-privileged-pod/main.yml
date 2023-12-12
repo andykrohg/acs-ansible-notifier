@@ -44,11 +44,13 @@
   - name: Print out bindings to be removed
     debug:
       msg: |
-        Removing the following bindings:
+        Removing the following ClusterRoleBindings:
         
-        {{ clusterrolebindings.stdout | from_json | to_nice_json }}
+        {{ clusterrolebindings.stdout | from_json }}
 
-        {{ rolebindings.stdout | from_json | to_nice_json }}
+        Removing the following RoleBindings:
+
+        {{ rolebindings.stdout | from_json }}
 
   - name: Remove bindings
     k8s:
