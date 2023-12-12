@@ -25,14 +25,19 @@
     set_fact:
       username: "{{ username_hits.stdout_lines | first }}"
 
+  - name: Ensure jq is present
+    package:
+      name: jq
+      state: present
+
   - name: Get ClusterRoleBindings
     shell: >
-      oc get clusterrolebindings -o json | jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
+      oc get clusterrolebindings -o json | ./jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
     register: clusterrolebindings
 
   - name: Get RoleBindings
     shell: >
-      oc get rolebindings -A -o json | jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
+      oc get rolebindings -A -o json | ./jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
     register: rolebindings
 
   - name: Print out bindings to be removed
