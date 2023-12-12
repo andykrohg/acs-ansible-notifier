@@ -6,18 +6,24 @@
     debug:
       msg: "{{ alert }}"
   
-  - name: Obtain Pod UID
+  - name: Get pod name and namespace
     set_fact:
-      pod_uid: "{{ alert.processViolation.processes[0].podUid }}"
+      pod_name: "{{ alert.processViolation.processes[0].podId }}"
+      pod_namespace: "{{ alert.processViolation.processes[0].namespace }}"
 
-  - name: Get audit log
-    shell: >
-      oc adm node-logs --role=master --path=kube-apiserver/audit.log | grep {{ pod_uid }}
-    register: audit_log_output
+  - name: Search audit log for offending pod
+    shell: |
+      for mn in $(oc get nodes -l node-role.kubernetes.io/master -o custom-columns=NODE:.metadata.name --no-headers);
+      do
+        oc adm node-logs $mn \
+        --path=kube-apiserver/audit.log |  \
+        jq 'select(.objectRef.name == "{{ pod_name }}" and .objectRef.namespace == "{{ pod_namespace }}" and .verb == "create").user.username' -r;
+      done
+    register: username_hits
 
   - name: Get User name
     set_fact:
-      username: "{{ audit_log_output.stdout | regex_search('\"username\":\"([a-z0-9]+)\"', '\\1') | first }}"
+      username: "{{ username_hits.stdout_lines | first }}"
 
   - name: Get ClusterRoleBindings
     shell: >
