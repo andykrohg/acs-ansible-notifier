@@ -11,6 +11,11 @@
       pod_name: "{{ alert.processViolation.processes[0].podId }}"
       pod_namespace: "{{ alert.processViolation.processes[0].namespace }}"
 
+  - name: Ensure jq is present
+    package:
+      name: jq
+      state: present
+
   - name: Search audit log for offending pod
     shell: |
       for mn in $(oc get nodes -l node-role.kubernetes.io/master -o custom-columns=NODE:.metadata.name --no-headers);
@@ -24,11 +29,6 @@
   - name: Get User name
     set_fact:
       username: "{{ username_hits.stdout_lines | first }}"
-
-  - name: Ensure jq is present
-    package:
-      name: jq
-      state: present
 
   - name: Get ClusterRoleBindings
     shell: >
