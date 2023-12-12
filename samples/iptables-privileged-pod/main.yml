@@ -12,7 +12,7 @@
       pod_namespace: "{{ alert.processViolation.processes[0].namespace }}"
 
   - name: Ensure jq is present
-    shell: dnf install jq -y
+    shell: yum install jq -y
       
 
   - name: Search audit log for offending pod
