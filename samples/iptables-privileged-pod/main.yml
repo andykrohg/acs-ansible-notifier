@@ -41,16 +41,13 @@
       oc get rolebindings -A -o json | ./jq '[.items[] | select(has("subjects") and .subjects[].name=="{{ username }}")]'
     register: rolebindings
 
-  - name: Print out bindings to be removed
+  - name: Print ClusterRoleBindings to be removed
     debug:
-      msg: |
-        Removing the following ClusterRoleBindings:
-        
-        {{ clusterrolebindings.stdout | from_json }}
+      msg: "{{ clusterrolebindings.stdout | from_json }}"
 
-        Removing the following RoleBindings:
-
-        {{ rolebindings.stdout | from_json }}
+  - name: Print RoleBindings to be removed
+    debug:
+      msg: "{{ rolebindings.stdout | from_json }}"
 
   - name: Remove bindings
     k8s:
