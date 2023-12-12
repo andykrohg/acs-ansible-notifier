@@ -11,9 +11,11 @@
       pod_name: "{{ alert.processViolation.processes[0].podId }}"
       pod_namespace: "{{ alert.processViolation.processes[0].namespace }}"
 
-  - name: Ensure jq is present
-    shell: yum install jq -y
-      
+  - name: Get jq
+    ansible.builtin.get_url:
+      url: https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
+      dest: ./jq
+      mode: 0777
 
   - name: Search audit log for offending pod
     shell: |
@@ -21,7 +23,7 @@
       do
         oc adm node-logs $mn \
         --path=kube-apiserver/audit.log |  \
-        jq 'select(.objectRef.name == "{{ pod_name }}" and .objectRef.namespace == "{{ pod_namespace }}" and .verb == "create").user.username' -r;
+        ./jq 'select(.objectRef.name == "{{ pod_name }}" and .objectRef.namespace == "{{ pod_namespace }}" and .verb == "create").user.username' -r;
       done
     register: username_hits
 
