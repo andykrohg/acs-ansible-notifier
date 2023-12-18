@@ -11,34 +11,29 @@
   - block:
     - name: Obtain Deployment and Image Info
       set_fact:
-        # deployment_namespace: "{{ alert.deployment.namespace }}"
-        # deployment_name: "{{ alert.deployment.name }}"
-        # image_registry: "{{ alert.deployment.containers[0].image.name.registry }}"
-        # image_name: "{{ alert.deployment.containers[0].image.name.fullName }}"
-        deployment_namespace: andy
-        deployment_name: dc-metro-map
-        deployment_kind: Deployment
-        # image_sha256: sha256:0fa8b080408e5cca922c64e63eba7e6d67cb5ca69f91332da2b621ee4b4d4ddf
-        # image_registry: "{{ alert.deployment.containers[0].image.name.registry }}"
-        # image_name: "{{ alert.deployment.containers[0].image.name.fullName }}"
+        deployment_namespace: "{{ alert.deployment.namespace }}"
+        deployment_name: "{{ alert.deployment.name }}"
+        image_sha256: "{{ alert.deployment.containers[0].image.id }}"
+        image_registry: "{{ alert.deployment.containers[0].image.name.registry }}"
+        image_name: "{{ alert.deployment.containers[0].image.name.fullName }}"
     rescue:
     - debug: 
         msg: "Unexpected payload format. Failure details: {{ ansible_failed_result }}"
     - meta: end_play
 
-  - name: Unschedule offending workload
-    k8s:
-      definition: |
-        apiVersion: apps/v1
-        kind: {{ deployment_kind }}
-        metadata:
-          name: {{ deployment_name }}
-          namespace: {{ deployment_namespace }}
-        spec:
-          replicas: 0
+  # - name: Unschedule offending workload
+  #   k8s:
+  #     definition: |
+  #       apiVersion: apps/v1
+  #       kind: {{ deployment_kind }}
+  #       metadata:
+  #         name: {{ deployment_name }}
+  #         namespace: {{ deployment_namespace }}
+  #       spec:
+  #         replicas: 0
 
 # TODO: implement this for the internal registry too and use `oc delete image ...`
-  - name: Delete the offending image
-    shell: >
-      skopeo delete docker://registry-andy.apps.aromerot.sandbox2426.opentlc.com/aromero/dc-metro-map:latest
+  # - name: Delete the offending image
+  #   shell: >
+  #     skopeo delete docker://registry-andy.apps.aromerot.sandbox2426.opentlc.com/aromero/dc-metro-map:latest
  
