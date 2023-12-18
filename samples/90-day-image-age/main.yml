@@ -22,22 +22,22 @@
         - name: End the play
           ansible.builtin.meta: end_play
 
-  # - name: Unschedule offending workload
-  #   k8s:
-  #     definition: |
-  #       apiVersion: apps/v1
-  #       kind: {{ deployment_kind }}
-  #       metadata:
-  #         name: {{ deployment_name }}
-  #         namespace: {{ deployment_namespace }}
-  #       spec:
-  #         replicas: 0
+    - name: Unschedule offending workload
+      k8s:
+        definition: |
+          apiVersion: apps/v1
+          kind: {{ deployment_kind }}
+          metadata:
+            name: {{ deployment_name }}
+            namespace: {{ deployment_namespace }}
+          spec:
+            replicas: 0
 
 # TODO: implement this for the internal registry too and use `oc delete image ...`
-    # - name: Delete the offending image
-    #   ansible.builtin.uri:
-    #     url: "http://{{ image_registry }}/v2/{{ image_name }}/manifests/{{ image_sha256 }}"
-    #     method: DELETE
-    #     status_code:
-    #       - 202
-    #       - 404
+    - name: Delete the offending image
+      ansible.builtin.uri:
+        url: "http://{{ image_registry }}/v2/{{ image_name }}/manifests/{{ image_sha256 }}"
+        method: DELETE
+        status_code:
+          - 202
+          - 404
