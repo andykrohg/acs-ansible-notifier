@@ -9,4 +9,5 @@ skopeo copy docker://quay.io/aromero/dc-metro-map:latest docker://$REGISTRY_HOST
 
 # Create a new app referencing the temporary image
 oc new-app $REGISTRY_HOST/aromero/dc-metro-map:latest
+oc patch deployment dc-metro-map -p '{"spec":{"template":{"spec":{"containers":[{"name":"dc-metro-map","imagePullPolicy":"Always"}]}}}}'
 oc expose service/dc-metro-map
