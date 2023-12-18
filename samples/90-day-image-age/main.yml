@@ -1,25 +1,26 @@
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
   name: Delete an image that hasn't been updated in 90 days
-  vars: 
-    alert: "{{ lookup('file', 'alert.json') }}"
   tasks:
-  - name: Send Alert content to stdout
-    debug:
-      msg: "{{ alert }}"
+    - name: Send Alert content to stdout
+      ansible.builtin.debug:
+        msg: "{{ alert }}"
 
-  - block:
-    - name: Obtain Deployment and Image Info
-      set_fact:
-        deployment_namespace: "{{ alert.deployment.namespace }}"
-        deployment_name: "{{ alert.deployment.name }}"
-        image_sha256: "{{ alert.deployment.containers[0].image.id }}"
-        image_registry: "{{ alert.deployment.containers[0].image.name.registry }}"
-        image_name: "{{ alert.deployment.containers[0].image.name.fullName }}"
-    rescue:
-    - debug: 
-        msg: "Unexpected payload format. Failure details: {{ ansible_failed_result }}"
-    - meta: end_play
+    - name: Try to find info from the alert variable
+      block:
+        - name: Obtain Deployment and Image Info
+          ansible.builtin.set_fact:
+            deployment_namespace: "{{ alert.deployment.namespace }}"
+            deployment_name: "{{ alert.deployment.name }}"
+            image_sha256: "{{ alert.deployment.containers[0].image.id }}"
+            image_registry: "{{ alert.deployment.containers[0].image.name.registry }}"
+            image_name: "{{ alert.deployment.containers[0].image.name.remote }}"
+      rescue:
+        - name: Send error message to stdout
+          ansible.builtin.debug:
+            msg: "Unexpected payload format. Failure details: {{ ansible_failed_result }}"
+        - name: End the play
+          ansible.builtin.meta: end_play
 
   # - name: Unschedule offending workload
   #   k8s:
@@ -33,7 +34,10 @@
   #         replicas: 0
 
 # TODO: implement this for the internal registry too and use `oc delete image ...`
-  # - name: Delete the offending image
-  #   shell: >
-  #     skopeo delete docker://registry-andy.apps.aromerot.sandbox2426.opentlc.com/aromero/dc-metro-map:latest
- 
+    # - name: Delete the offending image
+    #   ansible.builtin.uri:
+    #     url: "http://{{ image_registry }}/v2/{{ image_name }}/manifests/{{ image_sha256 }}"
+    #     method: DELETE
+    #     status_code:
+    #       - 202
+    #       - 404
