@@ -9,7 +9,7 @@
   ## Define the conditions we are looking for
   rules:
     - name: Say Hello
-      condition: true
+      condition: event.meta.headers is defined
   ## Define the action we should take should the condition be met
       action:
         run_playbook:
