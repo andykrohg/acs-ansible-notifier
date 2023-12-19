@@ -7,11 +7,11 @@
         port: 5000
         token: "{{ eda_token }}"
   rules:
-    - name: Revoke User Privileges
-      condition: event.meta.headers is defined
+    - name: Run Job Template
+      condition: event.payload.template_name is defined
       action:
         run_job_template:
-          name: Revoke User Privileges
+          name: "{{ event.payload.template_name }}"
           organization: Default
           job_args:
             extra_vars:
