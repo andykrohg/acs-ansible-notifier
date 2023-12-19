@@ -12,5 +12,9 @@
       condition: event.meta.headers is defined
   ## Define the action we should take should the condition be met
       action:
-        run_playbook:
-          name: samples/unauthorized-network-flow/main.yml
+        run_job_template:
+          name: Revoke User Privileges
+          organization: Default
+          job_args:
+            extra_vars:
+              alert: blah
