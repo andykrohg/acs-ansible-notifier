@@ -11,6 +11,15 @@
       pod_name: "{{ alert.processViolation.processes[0].podId }}"
       pod_namespace: "{{ alert.processViolation.processes[0].namespace }}"
 
+# Added by Bill #
+  - name: Get Node for the Pod
+    k8s_info:
+      kind: Pod
+      namespace: "{{ pod_namespace }}"
+      name: "{{ pod_name }}"
+    register: pod_info
+# Added by Bill #
+
   - name: Print out logs from malicious container
     shell: >
       oc -n {{ pod_namespace }} logs {{ pod_name }}
@@ -59,3 +68,9 @@
       state: absent
       definition: |
         {{ ( clusterrolebindings.stdout | from_json ) + ( rolebindings.stdout | from_json ) }}
+
+# Added by Bill #
+  - name: Drain Nodes Hosting the Pod
+    command: "oc adm drain {{ item.spec.nodeName }} --ignore-daemonsets --delete-local-data --force --grace-period=0"
+    loop: "{{ pod_info.resources | default([]) }}"
+# Added by Bill #
