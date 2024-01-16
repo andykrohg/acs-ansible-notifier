@@ -1,0 +1,7 @@
+- name: Drain the identified node if approved
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+    - name: Drain nodes hosting the pod
+      command: "oc adm drain {{ node_name }} --ignore-daemonsets --delete-local-data --force --grace-period=0"

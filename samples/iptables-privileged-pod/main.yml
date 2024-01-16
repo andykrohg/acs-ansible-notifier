@@ -59,3 +59,15 @@
       state: absent
       definition: |
         {{ ( clusterrolebindings.stdout | from_json ) + ( rolebindings.stdout | from_json ) }}
+
+  - name: Get node for the pod
+    k8s_info:
+      kind: Pod
+      namespace: "{{ pod_namespace }}"
+      name: "{{ pod_name }}"
+    register: pod_info
+
+  - name: Set node name for workflow
+    set_stats:
+      data:
+        node_name: "{{ pod_info.resources[0].spec.nodeName }}"
