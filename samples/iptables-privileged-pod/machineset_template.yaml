@@ -1,0 +1,62 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  name: {{ machineSetName }} # demo-machineset
+  namespace: openshift-machine-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: {{ clusterName }}
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: {{ clusterName }}
+    spec:
+      lifecycleHooks: {}
+      metadata: {}
+      providerSpec:
+        value:
+          userDataSecret:
+            name: worker-user-data
+          placement:
+            availabilityZone: {{ clusterRegion }}{{ clusterAvailabilityZone }}
+            region: {{ clusterRegion }}
+          credentialsSecret:
+            name: aws-cloud-credentials
+          instanceType: {{ instanceType }} # m6i.4xlarge
+          metadata:
+            creationTimestamp: null
+          blockDevices:
+            - ebs:
+                encrypted: true
+                iops: 0
+                kmsKey:
+                  arn: ''
+                volumeSize: 120
+                volumeType: gp3
+          securityGroups:
+            - filters:
+                - name: 'tag:Name'
+                  values:
+                    - {{ clusterName }}-worker-sg
+          kind: AWSMachineProviderConfig
+          metadataServiceOptions: {}
+          tags:
+            - name: kubernetes.io/cluster/{{ clusterName }}
+              value: owned
+          deviceIndex: 0
+          ami:
+            id: {{ amiId }} # ami-0b577c67f5371f6d1
+          subnet:
+            filters:
+              - name: 'tag:Name'
+                values:
+                  - {{ clusterName }}-private-{{ clusterRegion }}{{ clusterAvailabilityZone }}
+          apiVersion: machine.openshift.io/v1beta1
+          iamInstanceProfile:
+            id: {{ clusterName }}-worker-profile
+      taints:
+        - effect: NoSchedule
+          key: demo
+          value: sure
