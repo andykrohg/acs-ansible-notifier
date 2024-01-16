@@ -67,13 +67,7 @@
       name: "{{ pod_name }}"
     register: pod_info
 
-  - name: Remove existing node_name file if it exists
-    file:
-      path: "/tmp/node_name.txt"
-      state: absent
-
-# TODO: VERIFY. I know for our demo we are only spinning up one pod, but I believe the k8s module iss returning a list, so I'm specifying the first result in the list just to be safe, but need to test this. #
-  - name: Save node name to a temporary file
-    copy:
-      content: "{{ pod_info.resources[0].spec.nodeName }}"
-      dest: "/tmp/node_name.txt"
+  - name: Set node name for workflow
+    set_stats:
+      data:
+        node_name: "{{ pod_info.resources[0].spec.nodeName }}"
