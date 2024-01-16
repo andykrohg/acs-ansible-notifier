@@ -8,10 +8,11 @@ iptables -h
 ```
 
 ## Preparing the MachineSet
-Before executing the above commands though, we want to prepare the OpenShift environment. Specifically, this involves creating a MachineSet, which is responsible for creating the nodes whch will host the necessary containers for this demo.
+Before executing the above commands though, we want to prepare the OpenShift environment. Specifically, this involves creating a MachineSet, which is responsible for creating the nodes whch will host the containers for this portion of the demo.
 
 ### 1. Configure the MachineSet Template:
 Using the provided `machineset_template.yaml` file as a starting point, you'll need to fill in the specific values that match your OpenShift environment. 
+
 **Tip:**  If you're unsure about what values to use, you can refer to a pre-existing MachineSet in your environment. This can provide a good baseline for the configurations needed.
 
 ### 2. Set Up Taints and Tolerations:
