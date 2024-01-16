@@ -28,6 +28,13 @@
       oc -n {{ pod_namespace }} logs {{ pod_name }}
     ignore_errors: yes
 
+  - name: Kill the pod
+    k8s:
+      kind: Pod
+      name: "{{ pod_name }}"
+      namespace: "{{ pod_namespace }}"
+      state: absent
+
   - name: Get jq
     ansible.builtin.get_url:
       url: https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
