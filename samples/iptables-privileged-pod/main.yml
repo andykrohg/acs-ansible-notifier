@@ -11,13 +11,6 @@
       pod_name: "{{ alert.processViolation.processes[0].podId }}"
       pod_namespace: "{{ alert.processViolation.processes[0].namespace }}"
 
-  - name: Get Node for the Pod
-    k8s_info:
-      kind: Pod
-      namespace: "{{ pod_namespace }}"
-      name: "{{ pod_name }}"
-    register: pod_info
-
   - name: Print out logs from malicious container
     shell: >
       oc -n {{ pod_namespace }} logs {{ pod_name }}
@@ -67,6 +60,20 @@
       definition: |
         {{ ( clusterrolebindings.stdout | from_json ) + ( rolebindings.stdout | from_json ) }}
 
-  - name: Drain Nodes Hosting the Pod
-    command: "oc adm drain {{ item.spec.nodeName }} --ignore-daemonsets --delete-local-data --force --grace-period=0"
-    loop: "{{ pod_info.resources | default([]) }}"
+  - name: Get node for the pod
+    k8s_info:
+      kind: Pod
+      namespace: "{{ pod_namespace }}"
+      name: "{{ pod_name }}"
+    register: pod_info
+
+  - name: Remove existing node_name file if it exists
+    file:
+      path: "/tmp/node_name.txt"
+      state: absent
+
+# TODO: VERIFY. I know for our demo we are only spinning up one pod, but I believe the k8s module iss returning a list, so I'm specifying the first result in the list just to be safe, but need to test this. #
+  - name: Save node name to a temporary file
+    copy:
+      content: "{{ pod_info.resources[0].spec.nodeName }}"
+      dest: "/tmp/node_name.txt"
