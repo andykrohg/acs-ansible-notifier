@@ -10,11 +10,11 @@ iptables -h
 ## Preparing the MachineSet
 Before executing the above commands though, we want to prepare the OpenShift environment. Specifically, this involves creating a MachineSet, which is responsible for creating the nodes whch will host the necessary containers for this demo.
 
-1. Configure the MachineSet Template:
+### 1. Configure the MachineSet Template:
 Using the provided `machineset_template.yaml` file as a starting point, you'll need to fill in the specific values that match your OpenShift environment. 
 **Tip:**  If you're unsure about what values to use, you can refer to a pre-existing MachineSet in your environment. This can provide a good baseline for the configurations needed.
 
-2. Set Up Taints and Tolerations:
+### 2. Set Up Taints and Tolerations:
 It's crucial to set up appropriate taints on your new nodes and corresponding tolerations on your containers. For this demo, ensure that the taint on the node and the toleration on the container match. In the `machineset_template.yaml` file, this is represented by a key-value pair under tolerations. For example:
 ```yaml
 tolerations:
@@ -24,16 +24,16 @@ tolerations:
 ```
 **Note:** This taint must match the toleration in your container specifications to ensure the container runs on the intended node.
 
-3. Apply the MachineSet Configuration:
+### 3. Apply the MachineSet Configuration:
 Once you have filled in the necessary details in the `machineset_template.yaml`, apply it to your OpenShift cluster using the following command:
 ```bash
 oc apply -f machineset_template.yaml
 ```
 
-4. Wait for Nodes to Spin Up:
+### 4. Wait for Nodes to Spin Up:
 After applying the MachineSet configuration, new nodes will start to spin up. This process may take a few minutes.
 
-5. Verify Node Readiness:
+### 5. Verify Node Readiness:
 Check the readiness of the new nodes:
 ```bash
 oc get nodes
