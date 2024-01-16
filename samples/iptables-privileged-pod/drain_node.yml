@@ -1,0 +1,11 @@
+## TODO: Verify temp file saves and can be accessed. ##
+- name: Retrieve the saved node name and drain it
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Read node name from file
+      command: cat /tmp/node_name.txt
+      register: node_name
+
+    - name: Drain nodes hosting the pod
+      command: "oc adm drain {{ node_name.stdout }} --ignore-daemonsets --delete-local-data --force --grace-period=0"
