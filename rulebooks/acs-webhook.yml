@@ -8,10 +8,19 @@
         token: "{{ eda_token }}"
   rules:
     - name: Run Job Template
-      condition: event.payload.template_name is defined
+      condition: event.payload.job_template_name is defined
       action:
         run_job_template:
-          name: "{{ event.payload.template_name }}"
+          name: "{{ event.payload.job_template_name }}"
+          organization: Default
+          job_args:
+            extra_vars:
+              alert: "{{ event.payload.alert }}"
+    - name: Run Workflow Template
+      condition: event.payload.workflow_template_name is defined
+      action:
+        run_workflow_template:
+          name: "{{ event.payload.workflow_template_name }}"
           organization: Default
           job_args:
             extra_vars:
