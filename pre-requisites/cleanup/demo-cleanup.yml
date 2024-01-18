@@ -8,8 +8,8 @@
       - { name: "demo", namespace: "demo" }
       - { name: "dc-metro-map", namespace: "dc-metro-map" }
     users: ["bstrauss84", "roller1187", "andykrohg"]
-    source_image: "https://quay.io/aromero/dc-metro-map:latest"
-    Dest_image: "registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/aromero/dc-metro-map:latest"
+    source_image: "quay.io/aromero/dc-metro-map:latest"
+    dest_image: "registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/aromero/dc-metro-map:latest"
 
   tasks:
     - name: Delete sample deployments if they exist
@@ -24,8 +24,8 @@
     - name: Get list of nodes
       k8s_info:
         kind: Node
-      register: unschedulable_nodes
-      failed_when: unschedulable_nodes.resources is undefined
+      register: nodes
+      failed_when: nodes.resources is undefined
       ignore_errors: yes
 
     - name: Set unschedulable nodes as schedulable
@@ -35,8 +35,9 @@
         definition:
           spec:
             unschedulable: false
-      loop: "{{ unschedulable_nodes.resources }}"
-      when: item.spec.unschedulable == true
+      loop: "{{ nodes.resources }}"
+      when: "'unschedulable' in item.spec and item.spec.unschedulable == true"
+      no_log: true
       ignore_errors: yes
 
     - name: Ensure users have cluster-admin access
@@ -55,15 +56,8 @@
       loop: "{{ users }}"
       ignore_errors: yes
 
-    - name: Ensure specified image is loaded into registry
-      command: "skopeo copy docker://{{ source_image }} docker://{{ dest_image }}"
-      register: skopeo_copy
-      failed_when: skopeo_copy.rc != 0
-      ignore_errors: yes
-
-    - name: Output status for each task
-      debug:
-        msg: "Task '{{ ansible_loop_var }}' status: {{ item }}"
-      loop: "{{ ansible_play_batch }}"
-      loop_control:
-        loop_var: ansible_loop_var
+#    - name: Ensure specified image is loaded into registry
+#      command: "skopeo copy docker://{{ source_image }} docker://{{ dest_image }}"
+#      register: skopeo_copy
+#      failed_when: skopeo_copy.rc != 0
+#      ignore_errors: yes
