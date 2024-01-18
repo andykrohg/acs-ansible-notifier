@@ -16,11 +16,9 @@
       k8s:
         state: absent
         kind: Deployment
-        namespace: "{{ item.item.namespace }}"
-        name: "{{ item.item.name }}"
-      loop: "{{ deployment_status.results }}"
-      when: item.resources | length > 0
-      register: deletion_status
+        namespace: "{{ item.namespace }}"
+        name: "{{ item.name }}"
+      loop: "{{ deployments }}"
       ignore_errors: yes
 
     - name: Get list of nodes
