@@ -1,0 +1,71 @@
+---
+- name: ACS Ansible Notifier Demo Cleanup and Setup
+  hosts: localhost
+  gather_facts: no
+  vars:
+    deployments:
+      - { name: "test", namespace: "test" }
+      - { name: "demo", namespace: "demo" }
+      - { name: "dc-metro-map", namespace: "dc-metro-map" }
+    users: ["bstrauss84", "roller1187", "andykrohg"]
+    source_image: "https://quay.io/aromero/dc-metro-map:latest"
+    Dest_image: "registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/aromero/dc-metro-map:latest"
+
+  tasks:
+    - name: Delete sample deployments if they exist
+      k8s:
+        state: absent
+        kind: Deployment
+        namespace: "{{ item.item.namespace }}"
+        name: "{{ item.item.name }}"
+      loop: "{{ deployment_status.results }}"
+      when: item.resources | length > 0
+      register: deletion_status
+      ignore_errors: yes
+
+    - name: Get list of nodes
+      k8s_info:
+        kind: Node
+      register: unschedulable_nodes
+      failed_when: unschedulable_nodes.resources is undefined
+      ignore_errors: yes
+
+    - name: Set unschedulable nodes as schedulable
+      k8s:
+        kind: Node
+        name: "{{ item.metadata.name }}"
+        definition:
+          spec:
+            unschedulable: false
+      loop: "{{ unschedulable_nodes.resources }}"
+      when: item.spec.unschedulable == true
+      ignore_errors: yes
+
+    - name: Ensure users have cluster-admin access
+      k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        name: "{{ item }}-cluster-admin"
+        definition:
+          subjects:
+            - kind: User
+              name: "{{ item }}"
+          roleRef:
+            kind: ClusterRole
+            name: cluster-admin
+            apiGroup: rbac.authorization.k8s.io
+      loop: "{{ users }}"
+      ignore_errors: yes
+
+    - name: Ensure specified image is loaded into registry
+      command: "skopeo copy docker://{{ source_image }} docker://{{ dest_image }}"
+      register: skopeo_copy
+      failed_when: skopeo_copy.rc != 0
+      ignore_errors: yes
+
+    - name: Output status for each task
+      debug:
+        msg: "Task '{{ ansible_loop_var }}' status: {{ item }}"
+      loop: "{{ ansible_play_batch }}"
+      loop_control:
+        loop_var: ansible_loop_var
