@@ -7,7 +7,7 @@ oc new-app registry -e REGISTRY_STORAGE_DELETE_ENABLED=true -n old-image
 oc create route edge registry --service=registry -n old-image
 
 # Copy image from quay.io into registry
-REGISTRY_HOST=$(oc get route registry --template='{{ .spec.host }}') -n old-image
+REGISTRY_HOST=$(oc get route registry --template='{{ .spec.host }}' -n old-image)
 skopeo copy docker://quay.io/aromero/dc-metro-map:latest docker://$REGISTRY_HOST/aromero/dc-metro-map:latest
 
 # Create a new app referencing the temporary image
