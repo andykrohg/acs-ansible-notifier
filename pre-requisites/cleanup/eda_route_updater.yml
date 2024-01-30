@@ -1,0 +1,49 @@
+---
+- name: Look for the new EDA rulebook service and update the EDA route when appropriate
+  hosts: localhost
+  gather_facts: no
+  vars:
+    route_name: eda-rulebook
+    namespace: ansible-automation-platform
+    eda_label_value: eda
+
+  tasks:
+    - name: Gather the information about the EDA service
+      k8s_info:
+        api_version: v1
+        kind: Service
+        namespace: "{{ namespace }}"
+        label_selectors:
+          - "app = {{ eda_label_value }}"
+      register: eda_service
+
+#    - name: Debug EDA service
+#      debug:
+#        var: eda_service
+
+    - name: Check if EDA services are found
+      fail:
+        msg: "No EDA services found. The rulebook activation may need to be restarted or requires attention/review."
+      when: eda_service.resources | length == 0
+
+    - name: Extract the EDA service name
+      set_fact:
+        eda_service_name: "{{ (eda_service.resources[0].metadata.name) }}"
+      when: eda_service.resources | length > 0
+
+#    - name: Debug EDA service name
+#      debug:
+#        var: eda_service_name
+
+    - name: Update the EDA route with the new EDA service name
+      k8s:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: "{{ route_name }}"
+        namespace: "{{ namespace }}"
+        definition:
+          spec:
+            to:
+              kind: Service
+              name: "{{ eda_service_name }}"
+      when: eda_service_name is defined
