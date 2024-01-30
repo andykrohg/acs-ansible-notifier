@@ -4,8 +4,7 @@
   gather_facts: no
   vars:
     deployments:
-      - { name: "test", namespace: "test" }
-      - { name: "demo", namespace: "demo" }
+      - { name: ["ttyd-1", "ttyd-2"], namespace: "ttyd" }
       - { name: "dc-metro-map", namespace: "dc-metro-map" }
     users: ["bstrauss84", "roller1187", "andykrohg"]
     source_image: "quay.io/aromero/dc-metro-map:latest"
@@ -55,6 +54,9 @@
             apiGroup: rbac.authorization.k8s.io
       loop: "{{ users }}"
       ignore_errors: yes
+
+    - name: Confirm route is healthy
+      include_playbook: eda_route_updater.yml
 
 #    - name: Ensure specified image is loaded into registry
 #      command: "skopeo copy docker://{{ source_image }} docker://{{ dest_image }}"
