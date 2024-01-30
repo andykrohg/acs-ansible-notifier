@@ -4,8 +4,7 @@
   gather_facts: no
   vars:
     deployments:
-      - { name: "test", namespace: "test" }
-      - { name: "demo", namespace: "demo" }
+      - { name: "ttyd", namespace: "ttyd" }
       - { name: "dc-metro-map", namespace: "dc-metro-map" }
     users: ["bstrauss84", "roller1187", "andykrohg"]
     source_image: "quay.io/aromero/dc-metro-map:latest"
