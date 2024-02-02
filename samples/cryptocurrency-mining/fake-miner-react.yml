@@ -8,7 +8,7 @@
         msg: "{{ alert }}"
       ignore_errors: yes
 
-    - name: Get node name for the pod
+    - name: Get pod name
       k8s_info:
         kind: Pod
         namespace: "{{ alert.processViolation.processes[0].namespace }}"
@@ -19,14 +19,6 @@
     - name: Display pod info
       debug:
         msg: "{{ pod_info.stdout  }}"
-      ignore_errors: yes
-
-    - name: Get SMTP credentials
-      k8s_info:
-        kind: Secret
-        name: smtp-credentials
-        namespace: crypto
-      register: smtp_secret
       ignore_errors: yes
 
     - name: Get Slack webhook token
@@ -72,22 +64,6 @@
 #    - name: Stage pod logs
 #      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto > /tmp/crypto-pod-logs.log 
 #      ignore_errors: yes
-
-    - name: Send email to important people
-      community.general.mail:
-        username: '{{ smtp_secret.resources[0].data.username | b64decode }}'
-        password: '{{ smtp_secret.resources[0].data.password | b64decode }}'
-        host: smtp.gmail.com
-        port: 587
-        to: Bill Strauss <bistraus@redhat.com>, Andres Romero <aromero@redhat.com>
-        from: ACS Violation Alerts <acs-violation-alerts@demo.com>
-        subject: "Security Alert: Cryptocurrency Attempt Detected and Blocked"
-        body: "Someone's attempting to do some cryptocurrency mining in your environment.  Take a look at the attached logs and paint the streets red with their blood."
-        attach: /tmp/{{ pod_info.name  }}.log
-#        attach: /tmp/crypto-pod-logs.log
-        secure: try
-      no_log: True
-      ignore_errors: yes
 
     - name: "Scale down the deployment - so much for 'HODL'"
       k8s:
