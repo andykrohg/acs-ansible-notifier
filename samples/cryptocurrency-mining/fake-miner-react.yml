@@ -74,7 +74,7 @@
 #      ignore_errors: yes
 
     - name: Send email to important people
-      mail:
+      community.general.mail:
         username: '{{ smtp_secret.resources[0].data.username | b64decode }}'
         password: '{{ smtp_secret.resources[0].data.password | b64decode }}'
         host: smtp.gmail.com
