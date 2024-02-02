@@ -55,8 +55,7 @@
       loop: "{{ users }}"
       ignore_errors: yes
 
-    - name: Confirm route is healthy
-      include_playbook: eda_route_updater.yml
+    - import_playbook: eda_route_updater.yml
 
 #    - name: Ensure specified image is loaded into registry
 #      command: "skopeo copy docker://{{ source_image }} docker://{{ dest_image }}"
