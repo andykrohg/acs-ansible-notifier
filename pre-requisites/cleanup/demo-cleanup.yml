@@ -4,8 +4,8 @@
   gather_facts: no
   vars:
     deployments:
-      - { name: ["ttyd-1", "ttyd-2"], namespace: "ttyd" }
-      - { name: "dc-metro-map", namespace: "dc-metro-map" }
+      - ttyd-1
+      - ttyd-2
     users: ["bstrauss84", "roller1187", "andykrohg"]
     source_image: "quay.io/aromero/dc-metro-map:latest"
     dest_image: "registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/aromero/dc-metro-map:latest"
@@ -15,8 +15,8 @@
       k8s:
         state: absent
         kind: Deployment
-        namespace: "{{ item.namespace }}"
-        name: "{{ item.name }}"
+        namespace: "ttyd"
+        name: "{{ item }}"
       loop: "{{ deployments }}"
       ignore_errors: yes
 
