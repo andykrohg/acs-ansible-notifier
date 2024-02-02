@@ -18,7 +18,7 @@
 
     - name: Display pod info
       debug:
-        msg: "{{ pod_info.stdout  }}"
+        msg: "{{ pod_info }}"
       ignore_errors: yes
 
     - name: Get Slack webhook token
