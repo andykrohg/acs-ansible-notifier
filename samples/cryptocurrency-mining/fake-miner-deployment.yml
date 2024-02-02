@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: real-fake-miner
+  namespace: crypto 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: real-fake-miner
+  template:
+    metadata:
+      labels:
+        app: real-fake-miner
+    spec:
+      containers:
+      - name: real-fake-miner
+        image: registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/real-fake-crypto-miner:latest
+        command: ["/bin/sh", "-c"]
+        args: ["./cpuminer/minerd -h || while :; do echo cpuminer failed to start, container is idle...; sleep 300; done"]

@@ -1,0 +1,115 @@
+---
+- hosts: localhost
+  gather_facts: no
+  name: Scale down deployment with cryptocurrency mining activity
+  tasks:
+    - name: Send alert content to stdout
+      debug:
+        msg: "{{ alert }}"
+      ignore_errors: yes
+
+    - name: Get node name for the pod
+      k8s_info:
+        kind: Pod
+        namespace: "{{ alert.processViolation.processes[0].namespace }}"
+        name: "{{ alert.processViolation.processes[0].podId }}"
+      register: pod_info
+      ignore_errors: yes
+
+    - name: Display pod info
+      debug:
+        msg: "{{ pod_info.stdout  }}"
+      ignore_errors: yes
+
+    - name: Get SMTP credentials
+      k8s_info:
+        kind: Secret
+        name: smtp-credentials
+        namespace: crypto
+      register: smtp_secret
+      ignore_errors: yes
+
+    - name: Get Slack webhook token
+      k8s_info:
+        api_version: v1
+        kind: Secret
+        name: slack-webhook-secret
+        namespace: crypto
+      register: slack_secret
+      ignore_errors: yes
+
+    - name: Export pod logs
+#      shell: oc logs {{ pod_info.name  }} -n {{ pod_info.namespace }} > /tmp/{{ pod_info.name }}-logs.log
+#      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto > /tmp/crypto-pod-logs.log
+#      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto
+      shell: 'oc logs {{ pod_info.name }} -n {{ pod_info.namespace }}'
+      register: crypto_pod_logs
+      ignore_errors: yes
+
+# Had to add truncate due to message size limitations
+    - name: Notify team of violation via Slack
+      uri:
+        url: "https://hooks.slack.com/services/{{ slack_secret.resources[0].data.webhookToken | b64decode }}"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body: >
+          {
+            "text": "Detected cryptomining activity. Initiated containment and investigation procedures. Log summary: ```{{ crypto_pod_logs.stdout | truncate(3000, True, '... [Message truncated due to length]') }}```"
+          }
+      no_log: True
+      ignore_errors: yes
+
+    - name: Stage pod logs
+      shell: |
+        'echo {{ crypto_pod_logs.stdout }} > /tmp/{{ pod_info.name }}.log'
+      args:
+        executable: /bin/bash
+      when: crypto_pod_logs.stdout is defined
+      ignore_errors: yes
+
+#    - name: Stage pod logs
+#      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto > /tmp/crypto-pod-logs.log 
+#      ignore_errors: yes
+
+    - name: Send email to important people
+      mail:
+        username: '{{ smtp_secret.resources[0].data.username | b64decode }}'
+        password: '{{ smtp_secret.resources[0].data.password | b64decode }}'
+        host: smtp.gmail.com
+        port: 587
+        to: Bill Strauss <bistraus@redhat.com>, Andres Romero <aromero@redhat.com>
+        from: ACS Violation Alerts <acs-violation-alerts@demo.com>
+        subject: "Security Alert: Cryptocurrency Attempt Detected and Blocked"
+        body: "Someone's attempting to do some cryptocurrency mining in your environment.  Take a look at the attached logs and paint the streets red with their blood."
+        attach: /tmp/{{ pod_info.name  }}.log
+#        attach: /tmp/crypto-pod-logs.log
+        secure: try
+      no_log: True
+      ignore_errors: yes
+
+    - name: "Scale down the deployment - so much for 'HODL'"
+      k8s:
+        state: present
+        namespace: "{{ alert.deployment.namespace }}"
+        kind: Deployment
+        name: "{{ alert.deployment.name }}"
+#        name: "real-fake-miner"
+        definition:
+          spec:
+            replicas: 1
+      ignore_errors: yes
+
+    - name: Notify the important people of actions taken
+      debug:
+        msg: "Scaled down deployment {{ alert.deployment.name }} in namespace {{ alert.deployment.namespace }} due to someone still thinking there's money to be made in cryptocurrency mining and were attempting to do so in your environment."
+      ignore_errors: yes
+
+#TODO
+# Further actions could include: 
+# DONE - a notifier to send email out with additional context regarding this violation
+# DONE - pulling and storing (perhaps even emailing) pod logs
+# Possibly cordone hosting node
+# Quarantine pod/namespace with super restrictive network policies rather than scaling down the deployment.
+
