@@ -61,7 +61,7 @@
 #        name: "real-fake-miner"
         definition:
           spec:
-            replicas: 1
+            replicas: 0
       ignore_errors: yes
 
     - name: Notify the important people of actions taken
