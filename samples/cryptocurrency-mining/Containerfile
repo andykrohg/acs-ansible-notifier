@@ -1,0 +1,20 @@
+FROM fedora:latest
+
+# Update and install all the build tools and libraries and so on and so forth
+RUN dnf -y update && dnf install -y \
+        automake \
+        libcurl-devel \
+        git \
+        make \
+        autoconf \
+        gcc \
+        jansson-devel \
+        openssl-devel \
+        && git clone https://github.com/pooler/cpuminer.git \
+        && cd cpuminer \
+        && ./autogen.sh \
+        && CFLAGS="-march=native" ./configure \
+        && make
+
+# Run cpuminer in benchmark mode
+CMD ["./cpuminer/minerd", "-B"]
