@@ -34,7 +34,7 @@
 #      shell: oc logs {{ pod_info.name  }} -n {{ pod_info.namespace }} > /tmp/{{ pod_info.name }}-logs.log
 #      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto > /tmp/crypto-pod-logs.log
 #      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto
-      shell: 'oc logs {{ pod_info.name }} -n {{ pod_info.namespace }}'
+      shell: 'oc logs {{ pod_info.resources[0].metadata.name }} -n {{ pod_info.resources[0].metadata.namespace }}'
       register: crypto_pod_logs
       ignore_errors: yes
 
@@ -50,20 +50,7 @@
           {
             "text": "Detected cryptomining activity. Initiated containment and investigation procedures. Log summary: ```{{ crypto_pod_logs.stdout | truncate(3000, True, '... [Message truncated due to length]') }}```"
           }
-      no_log: True
       ignore_errors: yes
-
-    - name: Stage pod logs
-      shell: |
-        'echo {{ crypto_pod_logs.stdout }} > /tmp/{{ pod_info.name }}.log'
-      args:
-        executable: /bin/bash
-      when: crypto_pod_logs.stdout is defined
-      ignore_errors: yes
-
-#    - name: Stage pod logs
-#      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto > /tmp/crypto-pod-logs.log 
-#      ignore_errors: yes
 
     - name: "Scale down the deployment - so much for 'HODL'"
       k8s:
