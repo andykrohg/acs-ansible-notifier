@@ -30,7 +30,6 @@
     - name: Export pod logs
 #      shell: oc logs {{ pod_info.name  }} -n {{ pod_info.namespace }} > /tmp/{{ pod_info.name }}-logs.log
 #      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto > /tmp/crypto-pod-logs.log
-## testing registered var approach here
       shell: 'oc logs {{ pod_info.name }} -n {{ pod_info.namespace }}'
 #      shell: oc logs real-fake-miner-867d68b4cb-gjnkj -n crypto
       register: crypto_pod_logs
@@ -91,7 +90,6 @@
     - name: Notify the important people of actions taken
       debug:
         msg: "Scaled down deployment {{ alert.deployment.name }} in namespace {{ alert.deployment.namespace }} due to someone still thinking there's money to be made in cryptocurrency mining and were attempting to do so in your environment."
-#        msg: "someone's in yo shit"
 
 #TODO
 # Further actions could include: 
