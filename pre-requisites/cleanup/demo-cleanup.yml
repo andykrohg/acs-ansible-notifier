@@ -3,21 +3,16 @@
   hosts: localhost
   gather_facts: no
   vars:
-    deployments:
-      - ttyd-1
-      - ttyd-2
     users: ["bstrauss84", "roller1187", "andykrohg"]
     source_image: "quay.io/aromero/dc-metro-map:latest"
     dest_image: "registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/aromero/dc-metro-map:latest"
 
   tasks:
-    - name: Delete sample deployments if they exist
+    - name: Delete sample namespace if it exists
       k8s:
         state: absent
-        kind: Deployment
-        namespace: "ttyd"
-        name: "{{ item }}"
-      loop: "{{ deployments }}"
+        kind: Namespace
+        name: "ttyd"
       ignore_errors: yes
 
     - name: Get list of nodes
