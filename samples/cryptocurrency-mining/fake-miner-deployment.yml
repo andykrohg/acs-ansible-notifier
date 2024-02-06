@@ -17,4 +17,4 @@ spec:
       - name: real-fake-miner
         image: registry-old-image.apps.cluster-5rmld.5rmld.sandbox2205.opentlc.com/real-fake-crypto-miner:latest
         command: ["/bin/sh", "-c"]
-        args: ["./cpuminer/minerd -h || while :; do echo cpuminer failed to start, container is idle...; sleep 300; done"]
+        args: ["echo BEEP BOOP BEEP && echo \"Initiating top-secret, totally-legit, and definitely not \'cryptocurrency mining\' operation...\" && echo && echo && ./cpuminer/minerd -h && tail -f /dev/null"]
